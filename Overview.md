@@ -6,7 +6,7 @@ For this Exploration Activity 2, I will be using Pixi.js module to build Explora
 ### Purpose
 Pixi.js is a module primarily used for UI, graphics, and animations. According to their website, "PixiJS is a rendering system that uses WebGL (or optionally Canvas) to display images and other 2D visual content. It provides a full scene graph (a hierarchy of objects to render), and provides interaction support to enable handling click and touch events [[ref]](https://pixijs.com/guides/basics/what-pixijs-is)." For this program, the module is mainly used to handle multiple displays, events, and animations.
 
-### Usage
+### Usage/Functionality
 With Pixi.js, you can automatically set up an HTML <canvas> element that is ready to be configured. In this element, the user can create a root container that contains everything that needs displayed. This container is an object called "Stage" [[ref]](https://medium.com/@dancripps/pixi-js-usage-and-application-5cc8e2c58a2a). The syntax to create this root container is as simple as:
 
     //Create a Pixi Application
@@ -22,102 +22,58 @@ This creates a 200x200px black square canvas element. You can also style this el
     app.renderer.autoResize = true;
     app.renderer.resize(window.innerWidth, window.innerHeight);
 
-This is not done yet as you can also load sprites for animations and more interactivity. 
+This is not done yet as you can also load sprites for animations and more interactivity. These "sprites" are just basically images of which attributes you can modify. According to Medium.com, there are currently 3 ways to create sprites [[ref]](https://medium.com/@dancripps/pixi-js-usage-and-application-5cc8e2c58a2a):
+    - From a single image file.
+    - From a sub-image on a tileset.
+    - From a texture atlas
 
-Consequently, the entirety of the program will be mainly revolving around this one function to simulate in-game delays.
+Due to Pixi rendering its images on the GPU with WebGL, the images need to be formated so that they are compatible for the GPU. A formated image is called a texture, and this texture needs to be converted into a WebGL texture [[ref]](https://medium.com/@dancripps/pixi-js-usage-and-application-5cc8e2c58a2a). The following is the syntax:
 
-### Functionality
-According to Mozilla.org, "An async function declaration creates an AsyncFunction object. Each time when an async function is called, it returns a new Promise which will be resolved with the value returned by the async function, or rejected with an exception uncaught within the async function [[ref]](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)."
+    let texture = PIXI.utils.TextureCache["images/anySpriteImage.png"];
+    let sprite = new PIXI.Sprite(texture);
 
-Further, "Async functions can contain zero or more await expressions. Await expressions make promise-returning functions behave as though they're synchronous by suspending execution until the returned promise is fulfilled or rejected. The resolved value of the promise is treated as the return value of the await expression. Use of async and await enables the use of ordinary try/catch blocks around asynchronous code [ref]](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)."
+After conversion of the image, the image should then be loaded by a loader function:
+
+    PIXI.loader
+        .add("images/anyImage.png")
+        .load(setup);
+
+    function setup() {
+        let sprite = new PIXI.Sprite(
+            PIXI.loader.resources["images/anyImage.png"].texture
+        );
+    }
 
 #### Example
-    function resolveAfter2Seconds() {
-      console.log("starting slow promise");
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve("slow");
-          console.log("slow promise is done");
-        }, 2000);
-      });
-    }
-    
-    function resolveAfter1Second() {
-      console.log("starting fast promise");
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve("fast");
-          console.log("fast promise is done");
-        }, 1000);
-      });
-    }
-    
-    async function sequentialStart() {
-      console.log("== sequentialStart starts ==");
-    
-      // 1. Start a timer, log after it's done
-      const slow = resolveAfter2Seconds();
-      console.log(await slow);
-    
-      // 2. Start the next timer after waiting for the previous one
-      const fast = resolveAfter1Second();
-      console.log(await fast);
-    
-      console.log("== sequentialStart done ==");
-    }
-    
-    async function sequentialWait() {
-      console.log("== sequentialWait starts ==");
-    
-      // 1. Start two timers without waiting for each other
-      const slow = resolveAfter2Seconds();
-      const fast = resolveAfter1Second();
-    
-      // 2. Wait for the slow timer to complete, and then log the result
-      console.log(await slow);
-      // 3. Wait for the fast timer to complete, and then log the result
-      console.log(await fast);
-    
-      console.log("== sequentialWait done ==");
-    }
-    
-    async function concurrent1() {
-      console.log("== concurrent1 starts ==");
-    
-      // 1. Start two timers concurrently and wait for both to complete
-      const results = await Promise.all([
-        resolveAfter2Seconds(),
-        resolveAfter1Second(),
-      ]);
-      // 2. Log the results together
-      console.log(results[0]);
-      console.log(results[1]);
-    
-      console.log("== concurrent1 done ==");
-    }
-    
-    async function concurrent2() {
-      console.log("== concurrent2 starts ==");
-    
-      // 1. Start two timers concurrently, log immediately after each one is done
-      await Promise.all([
-        (async () => console.log(await resolveAfter2Seconds()))(),
-        (async () => console.log(await resolveAfter1Second()))(),
-      ]);
-      console.log("== concurrent2 done ==");
-    }
-    
-    sequentialStart(); // after 2 seconds, logs "slow", then after 1 more second, "fast"
-    
-    // wait above to finish
-    setTimeout(sequentialWait, 4000); // after 2 seconds, logs "slow" and then "fast"
-    
-    // wait again
-    setTimeout(concurrent1, 7000); // same as sequentialWait
-    
-    // wait again
-    setTimeout(concurrent2, 10000); // after 1 second, logs "fast", then after 1 more second, "slow"
+This example creates a blue background with a rabbit spinning in the middle [[ref]](https://pixijs.com/examples/sprite/basic). Cute, isn't it?
 
+    import * as PIXI from 'pixi.js';
+
+    const app = new PIXI.Application({ background: '#1099bb', resizeTo: window });
+
+    document.body.appendChild(app.view);
+
+    // create a new Sprite from an image path
+    const bunny = PIXI.Sprite.from('https://pixijs.com/assets/bunny.png');
+    
+    // center the sprite's anchor point
+    bunny.anchor.set(0.5);
+    
+    // move the sprite to the center of the screen
+    bunny.x = app.screen.width / 2;
+    bunny.y = app.screen.height / 2;
+
+    app.stage.addChild(bunny);
+    
+    // Listen for animate update
+    app.ticker.add((delta) =>
+    {
+        // just for fun, let's rotate mr rabbit a little
+        // delta is 1 if running at 100% performance
+        // creates frame-independent transformation
+        bunny.rotation += 0.1 * delta;
+    });
+    
 ## Origin
 Asynchronous programming was implemented by the language F# first then from there on, a lot more languages have started to adopt this programming style, especially C#, which was the first mainstream language that popularized the async/await keywords [[ref]](https://dev.to/maxarshinov/a-brief-history-of-asyncawait-264j).
 
