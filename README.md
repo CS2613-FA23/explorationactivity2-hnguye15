@@ -26,3 +26,5 @@ You can notice that in the box to the bottom right of the screen, there are othe
 
 ## How to run
 Just download the content of this repository (or clone it) in a folder. Then, run start_app.bat. The game will automatically detect your default browser and opens itself accordingly. When you are done with the game, be sure to go to the command terminal opened by the .bat file and press CTR-C to close the server hosting the game (press it again if it does not work the first time). Simple as that!
+
+NOTE: For those who are on MacOS, change your directory into the folder that contains all the files and then run this command in your console: "install -g http-server". Wait for it to finish downloading, then run this command "http-server -c-0 -o" while inside the very same folder. The game should open up correctly.
