@@ -1,0 +1,95 @@
+{
+	"frames": {
+		"rat1.png": {
+			"frame": {
+				"x": 1,
+				"y": 1,
+				"w": 62,
+				"h": 41
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 62,
+				"h": 41
+			},
+			"sourceSize": {
+				"w": 62,
+				"h": 41
+			}
+		},
+		"rat2.png": {
+			"frame": {
+				"x": 1,
+				"y": 44,
+				"w": 70,
+				"h": 47
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 70,
+				"h": 47
+			},
+			"sourceSize": {
+				"w": 70,
+				"h": 47
+			}
+		},
+		"rat3.png": {
+			"frame": {
+				"x": 73,
+				"y": 1,
+				"w": 70,
+				"h": 47
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 70,
+				"h": 47
+			},
+			"sourceSize": {
+				"w": 70,
+				"h": 47
+			}
+		},
+		"rat4.png": {
+			"frame": {
+				"x": 73,
+				"y": 50,
+				"w": 67,
+				"h": 44
+			},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {
+				"x": 0,
+				"y": 0,
+				"w": 67,
+				"h": 44
+			},
+			"sourceSize": {
+				"w": 67,
+				"h": 44
+			}
+		}
+	},
+	"meta": {
+		"app": "http://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"image": "rats.png",
+		"format": "RGBA8888",
+		"size": {
+			"w": 144,
+			"h": 95
+		},
+		"scale": "1"
+	}
+}

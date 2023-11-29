@@ -1,0 +1,17 @@
+:::::Done:::::
+-
+
+:::::Planned:::::
+- Implement enemy status (OOP):
++ Level
++ HP
++ MP
++ Attack
++ Magic?
++ Defense
++ Magic Resistance?
++ Buff(s)
++ Debuff(s)
++ Gold Drop
++ Exp Drop
++ Loot table (for next patch)

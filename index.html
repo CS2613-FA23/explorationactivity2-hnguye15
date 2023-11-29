@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="stylesheet" href="styles.css">
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>A Random Incremental Game</title>
+	</head>
+	<body>
+		<!-- Import pixi.js -->
+		<script src="./node_modules/pixi.js/dist/pixi.js"></script>
+		<script>
+		////GRAPHICS
+			const Graphics = PIXI.Graphics;
+			
+			//Main Display
+			let app = new PIXI.Application({
+				width: 640,
+				height: 360,
+				transparent: false,
+				antialias: true
+			});
+			
+			app.renderer.resize(window.innerWidth, window.innerHeight);
+			
+			app.renderer.view.style.position = "absolute";
+			
+			document.body.appendChild(app.view);
+			
+			//Containers
+			const screenContainer = new PIXI.Container();
+			
+			const topContainer = new PIXI.Container();
+			screenContainer.addChild(topContainer);
+			
+			const bottomContainer = new PIXI.Container();
+			screenContainer.addChild(bottomContainer);
+			//Containers inside top Container
+			const bckgrndContainer = new PIXI.Container();
+			topContainer.addChild(bckgrndContainer);
+			
+			const logContainer = new PIXI.Container();
+			topContainer.addChild(logContainer);
+			
+			//Containers inside bottomContainer
+			const leftContainer = new PIXI.Container();
+			bottomContainer.addChild(leftContainer);
+			const midContainer = new PIXI.Container();
+			bottomContainer.addChild(midContainer);
+			const rightContainer = new PIXI.Container();
+			bottomContainer.addChild(rightContainer);
+			
+			//Opening scene
+			const scene = new Graphics();
+			scene.beginFill(0x000000)
+			.drawRect(0, 0, window.innerWidth, window.innerHeight)
+			.endFill();
+			
+			const narration = new PIXI.Text("",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});
+			
+			narration.text = "The rotten stench of the underground sewers penetrates your nostrils, leaving you jolting awake in disgust."
+						   + "\n\nRising up like Frankenstein's monster, you have no clue why or how you ended up in this god forsaken place."
+						   + "\n\nThe last thing you can recall was getting hit hard in the head by someone --or \"something\"--";
+			
+			narration.x = window.innerWidth/50;
+			narration.y = window.innerHeight/3;
+			
+			const prompt = new PIXI.Text(">> Click Here <<",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});
+			
+			prompt.x = window.innerWidth/2.35;
+			prompt.y = window.innerHeight/1.1;
+			
+			prompt.eventMode = 'static';
+			prompt.cursor = 'pointer';
+			prompt.on('pointerdown', transition);
+			
+			app.stage.addChild(scene);
+			app.stage.addChild(narration);
+			app.stage.addChild(prompt);
+			
+			function transition() {
+				app.stage.removeChild(scene);
+				app.stage.removeChild(narration);
+				app.stage.removeChild(prompt);
+				app.stage.addChild(screenContainer);
+			}
+			
+			//Background
+			const bckgrnd = PIXI.Texture.from("./assets/backgrounds/sewer.png");
+			const bckgrndsprt = new PIXI.Sprite(bckgrnd);
+			bckgrndsprt.width = window.innerWidth/1.5;
+			bckgrndsprt.height = window.innerHeight/1.80;
+			bckgrndsprt.x = innerWidth/51;
+			bckgrndsprt.y = innerHeight/62;
+			
+			bckgrndContainer.addChild(bckgrndsprt);
+			
+			//Logs
+			const logOuterBorder = new Graphics();
+			logOuterBorder.beginFill(0x808080)
+			.drawRect(window.innerWidth/1.445, window.innerHeight/62, window.innerWidth/3.51, window.innerHeight/1.8)
+			.endFill();
+			
+			const logInnerBorder = new Graphics();
+			logInnerBorder.beginFill(0x000000)
+			.drawRect(window.innerWidth/1.437, window.innerHeight/42, window.innerWidth/3.615, window.innerHeight/1.855)
+			.endFill();
+			
+			const logSeparator = new Graphics();
+			logSeparator.beginFill(0x808080)
+			.drawRect(window.innerWidth/1.445, window.innerHeight/10, window.innerWidth/3.55, window.innerHeight/120)
+			.endFill();
+			
+			const logLabel = new PIXI.Text("Logs",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true // for better performance
+				});
+			
+			logLabel.x = window.innerWidth/1.225;
+			logLabel.y = window.innerHeight/28;
+			
+			logContainer.addChild(logOuterBorder);
+			logContainer.addChild(logInnerBorder);
+			logContainer.addChild(logLabel);
+			logContainer.addChild(logSeparator);
+			
+			const logs = [];
+			const logText = logContainer.addChild(new PIXI.Text("", {
+				fontSize: window.innerWidth / 70,
+				fill : 0x808080,
+				cacheAsBitmap: true
+			}));
+
+			logText.x = window.innerWidth/1.42;
+			logText.y = window.innerHeight/8.2;
+
+			//Dialogue/Menu box
+			const menuOuterBorder = new Graphics();
+			menuOuterBorder.beginFill(0x808080)
+			.drawRect(window.innerWidth/50, window.innerHeight/1.70, window.innerWidth/1.045, window.innerHeight/2.55)
+			.endFill();
+			
+			const menuInnerBorder = new Graphics();
+			menuInnerBorder.beginFill(0x000000)
+			.drawRect(window.innerWidth/42, window.innerHeight/1.68, window.innerWidth/1.054, window.innerHeight/2.65)
+			.endFill();
+			
+			const separatorLeft = new Graphics();
+			separatorLeft.beginFill(0x808080)
+			.drawRect(window.innerWidth/4.83, window.innerHeight/1.68, window.innerWidth/250, window.innerHeight/2.65)
+			.endFill();
+			
+			const separatorRight = new Graphics();
+			separatorRight.beginFill(0x808080)
+			.drawRect(window.innerWidth/1.206, window.innerHeight/1.68, window.innerWidth/250, window.innerHeight/2.65)
+			.endFill();
+			
+			bottomContainer.addChild(menuOuterBorder);
+			bottomContainer.addChild(menuInnerBorder);
+			bottomContainer.addChild(separatorLeft);
+			bottomContainer.addChild(separatorRight);
+			bottomContainer.addChild(leftContainer);
+			bottomContainer.addChild(midContainer);
+			bottomContainer.addChild(rightContainer);
+			
+			//Character portrait
+			const portrait = PIXI.Texture.from("./assets/characters/portrait.png");
+			const portraitSprite = new PIXI.Sprite(portrait);
+			portraitSprite.scale.set(window.innerWidth/19500, window.innerHeight/9450);
+			portraitSprite.x = innerWidth/30;
+			portraitSprite.y = innerHeight/1.63;
+			
+			leftContainer.addChild(portraitSprite);
+			
+			//Character stats
+			let lvlLabel = new PIXI.Text("Level: ",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			lvlLabel.x = window.innerWidth/4.58;
+			lvlLabel.y = window.innerHeight/1.65;
+			
+			const hpLabel = new PIXI.Text("HP: ",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			hpLabel.x = window.innerWidth/4.58;
+			hpLabel.y = window.innerHeight/1.48;
+			
+			const mpLabel = new PIXI.Text("MP: ",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			mpLabel.x = window.innerWidth/4.58;
+			mpLabel.y = window.innerHeight/1.33;
+			
+			const expLabel = new PIXI.Text("EXP: ",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			expLabel.x = window.innerWidth/2.5;
+			expLabel.y = window.innerHeight/1.65;
+			
+			const goldLabel = new PIXI.Text("Gold: ",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			goldLabel.x = window.innerWidth/2.5;
+			goldLabel.y = window.innerHeight/1.48;
+			
+			const progressLabel = new PIXI.Text("Progress: 0%",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});
+			
+			progressLabel.x = window.innerWidth/2.5;
+			progressLabel.y = window.innerHeight/1.33;
+			
+			const charDialogue = new PIXI.Text("\"I wonder where I am. I have an eerie feeling about this...\"",
+				{
+					fontSize : window.innerWidth / 50,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});
+			
+			charDialogue.x = window.innerWidth/4.58;
+			charDialogue.y = window.innerHeight/1.18;
+			
+			midContainer.addChild(lvlLabel);
+			midContainer.addChild(hpLabel);
+			midContainer.addChild(mpLabel);
+			midContainer.addChild(expLabel);
+			midContainer.addChild(goldLabel);
+			midContainer.addChild(charDialogue);
+			
+			//Buttons
+			const charBttnLabel = new PIXI.Text("CHARACTER",
+				{
+					fontSize : window.innerWidth / 60,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			charBttnLabel.x = window.innerWidth/1.175;
+			charBttnLabel.y = window.innerHeight/1.62;
+			
+			const invBttnLabel = new PIXI.Text("INVENTORY",
+				{
+					fontSize : window.innerWidth / 60,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			invBttnLabel.x = window.innerWidth/1.175;
+			invBttnLabel.y = window.innerHeight/1.41;
+			
+			const restBttnLabel = new PIXI.Text("REST",
+				{
+					fontSize : window.innerWidth / 60,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			restBttnLabel.x = window.innerWidth/1.175;
+			restBttnLabel.y = window.innerHeight/1.23;
+			
+			const ventureBttnLabel = new PIXI.Text("VENTURE",
+				{
+					fontSize : window.innerWidth / 60,
+					fill : 0x808080,
+					cacheAsBitmap: true
+				});  
+			
+			ventureBttnLabel.x = window.innerWidth/1.175;
+			ventureBttnLabel.y = window.innerHeight/1.10;
+			
+			rightContainer.addChild(charBttnLabel);
+			rightContainer.addChild(invBttnLabel);
+			rightContainer.addChild(restBttnLabel);
+			rightContainer.addChild(ventureBttnLabel);
+			
+			//On-click events
+			ventureBttnLabel.eventMode = 'static';
+			ventureBttnLabel.cursor = 'pointer';
+			ventureBttnLabel.on('pointerdown', venture);
+			
+			restBttnLabel.eventMode = 'static';
+			restBttnLabel.cursor = 'pointer';
+			restBttnLabel.on('pointerdown', rest);
+			
+			//Animations	
+			const spritesheet = "./assets/sprites/rat/rats.json";
+			PIXI.Assets.load(spritesheet);
+			// create an array of textures from an image path
+			const frames = [];
+			let filePath = "";
+
+			for(let i = 1; i < 5; i++) {
+				filePath = "./assets/sprites/rat/rat" + i + ".png";
+				frames.push(PIXI.Texture.from(filePath));
+			}
+			// create an AnimatedSprite
+			const anim = new PIXI.AnimatedSprite(frames);
+			/*
+			 * An AnimatedSprite inherits all the properties of a PIXI sprite
+			 * so you can change its position, its anchor, mask it, etc
+			 */
+			anim.x = bckgrndContainer.width / 2.3;
+			anim.y = bckgrndContainer.height / 1.43;
+			anim.scale.set(window.innerWidth/450, window.innerHeight/225);
+			anim.animationSpeed = 0.05;
+			anim.play();
+			
+		////LOGICS
+			//Global variables
+			var level = 1;
+			var exp = 0;
+			var nextLevelExp = 15;
+			var gold = 0;
+			var hp = 20;
+			var hpMax = 20;
+			var mp = 5;
+			var mpMax = 5;
+			var percentage = 0;
+			var enemyId = "";
+			var dmg = 0;
+			var multi = 1;
+			var isVenturing = false;
+			var isResting = false;
+			var abort = false;
+			
+			//Displays
+			lvlLabel.text = "Level: " + level;
+			hpLabel.text = "HP: " + hp + " / " + hpMax;
+			mpLabel.text = "MP: " + mp + " / " + mpMax;
+			expLabel.text = "Exp: " + exp + " / " + nextLevelExp;
+			goldLabel.text = "Gold: " + gold;
+			
+			//Misc Functions
+			async function sleep(ms) {
+				return new Promise(resolve => setTimeout(resolve, ms));  
+			}
+			
+			function getEnemyId() {
+				rand = Math.floor(Math.random() * 2);
+				switch (rand) {
+					case 0:
+						return "rat";
+						break;
+					case 1:
+						return "rat";
+						break;
+					default:
+						return "rat";
+				}
+				return;
+			}
+			
+			function abortAction() {
+				abort = true;
+			}
+			
+			//Progress-based function
+			async function venture() {
+				if (isVenturing || isResting) {
+					abortAction();
+					midContainer.removeChild(progressLabel);
+					bckgrndContainer.removeChild(anim);
+					return;
+				}
+				updateLog("- Venturing...");
+				ventureBttnLabel.text = "RETURN";
+				midContainer.addChild(progressLabel);
+				isVenturing = true;
+				enemyId = getEnemyId();
+				
+				let time = calcTime(enemyId);
+				dmg = calcDmg(enemyId);
+				
+				await updateVenture(enemyId, time);
+				
+				resetProgress();
+				
+				ventureBttnLabel.text = "VENTURE";
+				isVenturing = false;
+				midContainer.removeChild(progressLabel);
+				bckgrndContainer.removeChild(anim);
+			}
+			
+			async function updateVenture(enemyId, time) {
+				let calc = (time-0.1*level)/time;
+				let tickSpeed = time*10;
+				let moveTime = 10 * (Math.floor(Math.random() * 5) + 1);
+				let message = "- Encountered " + enemyId + "!";
+				
+				for (let i = 0; i < 100; i++) {
+					if (abort) {
+						abort = false;
+						ventureBttnLabel.text = "VENTURE";
+						return;
+					}
+					await sleep(moveTime);
+				}
+				
+				updateLog(message);
+				bckgrndContainer.addChild(anim);
+				
+				for (let i = 0; i < 100; i++) {
+					if (abort) {
+						abort = false;
+						ventureBttnLabel.text = "VENTURE";
+						return;
+					}
+					if (percentage <= 100) {percentage += 1;}
+					else {percentage = 0;}
+					progressLabel.text = "Progress: " + percentage +"%";
+					if (percentage > 0) {
+						if (calc > 0) {
+							//await sleep(tickSpeed*calc);
+							await sleep(tickSpeed);
+						}
+						else if (calc < 0) {
+							//begin automation based on each level above cap.
+							multi = 1;
+							multi = multi + calc * (-1);
+						}
+						else if (calc = 0) {
+							//do nothing
+						}
+					}
+				}
+				percentage = 0;
+				takeDmg(dmg);
+				if (hp > 0) {
+					addGold(enemyId, multi);
+					addExp(enemyId, multi);
+					levelUp();
+				}
+				else {
+					updateLog("- You fainted!");
+					isVenturing = false;
+					rest();
+				}
+			}
+			
+			function resetProgress() {
+				progress = 0;
+				progressLabel.text = "Progress: " + progress + "%";
+			}
+			
+			async function rest() {
+				if (isResting || isVenturing) {
+					abortAction();
+					return;
+				}
+				
+				if (hp == hpMax && mp == mpMax) {
+					updateLog("- You are already well-rested.");
+					abortAction();
+					return;
+				}
+				
+				isResting = true;
+				restBttnLabel.text = "STOP";
+				updateLog("- Resting...");
+				while (hp < hpMax || mp < mpMax) {
+					if (abort) {
+						abort = false;
+						isResting = false;
+						restBttnLabel.text = "REST";
+						return;
+					}
+					await sleep(1000);
+					if (hp < hpMax) {
+						hp++;
+						hpLabel.text = "HP: " + hp + " / " + hpMax;
+					}
+					if (mp < mpMax) {
+						mp++;
+						mpLabel.text = "MP: " + mp + " / " + mpMax;
+					}
+				}
+				restBttnLabel.text = "REST";
+				isResting = false;
+			}
+			
+			function updateLog(str) {
+				if (str.length > 40) {
+					if (str[40] == " " || (str[40] != " " && str[41] == " ")) {
+						logs.push(str.substring(0,41));
+					}
+					else {
+						logs.push(str.substring(0,41) + "-");
+					}
+					if (str[41] == " ") {
+						logs.push(str.substring(42));
+					}
+					else {
+						logs.push(str.substring(41));
+					}
+					
+				}
+				else {logs.push(str)}
+				
+				
+				if (logs.length > 13) {
+					while (logs.length > 13) {
+						logs.shift();
+					}
+				}
+				
+				logText.text = logs.join('\n');
+			}
+			
+			//Character-based Functions
+			function levelUp() {
+				let count = 0;
+				let str = "";
+				while (exp >= nextLevelExp) {
+					level++;
+					exp -= nextLevelExp;
+					nextLevelExp = Math.round(nextLevelExp*1.5);
+					hpMax = Math.round(hpMax*1.2) + 1;
+					mpMax = Math.round(mpMax*1.1) + 1;
+					hp = hpMax;
+					mp = mpMax
+					count++;
+				}
+				if (count == 1) {updateLog("- You have leveled up by 1 level!");}
+				else if (count > 1) {
+					str = "- You have leveled up by" + count + "levels!";
+					updateLog(str);
+				}
+				lvlLabel.text = "Level: " + level;
+				expLabel.text = "Exp: " + exp + " / " + nextLevelExp;
+				hpLabel.text = "HP: " + hp + " / " + hpMax;
+				mpLabel.text = "MP: " + mp + " / " + mpMax;
+			}
+			
+			//Calculation-based Functions
+			function calcTime(id) {
+				switch (id) {
+					case "rat":
+						return 4;
+					default:
+						return 0;
+				}
+			}
+			
+			function calcDmg(id) {
+				switch (id) {
+					case "rat":
+						return Math.floor(Math.random() * 5);
+					default:
+						return 0;
+				}
+			}
+			
+			function takeDmg(dmg) {
+				if (hp < dmg) {
+					hp = 0;
+				}
+				else {
+					hp = hp - dmg;
+				}
+				hpLabel.text = "HP: " + hp + " / " + hpMax;
+			}
+			
+			function addExp(id, multi) {
+				var amount = multi;
+				switch (id) {
+					case "rat":
+						amount *= 5;
+						break;
+					default:
+						amount = 0;
+				}
+				exp = exp + Math.round(amount);
+				expLabel.text = "Exp: " + exp + " / " + nextLevelExp;
+			}
+			
+			function addGold(id, multi) {
+				var amount = multi;
+				switch (id) {
+					case "rat":
+						amount *= Math.floor(Math.random() * 4);
+						break;
+					default:
+						amount = 0;
+				}
+				gold = gold + Math.round(amount);
+				goldLabel.text = "Gold: " + gold;
+			}
+		</script>
+	</body>
+</html>
