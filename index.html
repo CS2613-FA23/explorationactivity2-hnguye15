@@ -392,12 +392,20 @@
 			
 			//Progress-based function
 			async function venture() {
-				if (isVenturing || isResting) {
+				if (isResting) {
+					return;
+				}
+				
+				if (isVenturing) {
 					abortAction();
 					midContainer.removeChild(progressLabel);
 					bckgrndContainer.removeChild(anim);
+					percentage = 0;
+					updateLog("                           ----------");
 					return;
 				}
+				
+				
 				updateLog("- Venturing...");
 				ventureBttnLabel.text = "RETURN";
 				midContainer.addChild(progressLabel);
@@ -462,12 +470,14 @@
 				percentage = 0;
 				takeDmg(dmg);
 				if (hp > 0) {
-					addGold(enemyId, multi);
-					addExp(enemyId, multi);
+					updateLog("- Defeated rat!");
+					updateLog("- Gained " + addExp(enemyId, multi) + " exp.");
+					updateLog("- Looted " + addGold(enemyId, multi) + " gold.");
 					levelUp();
+					updateLog("                           ----------");
 				}
 				else {
-					updateLog("- You fainted!");
+					updateLog("- Fainted!");
 					isVenturing = false;
 					rest();
 				}
@@ -479,14 +489,18 @@
 			}
 			
 			async function rest() {
-				if (isResting || isVenturing) {
+				if (isVenturing) {
+					return;
+				}
+				if (isResting) {
 					abortAction();
+					updateLog("                           ----------");
 					return;
 				}
 				
 				if (hp == hpMax && mp == mpMax) {
-					updateLog("- You are already well-rested.");
-					abortAction();
+					updateLog("- Already well-rested.");
+					updateLog("                           ----------");
 					return;
 				}
 				
@@ -512,6 +526,7 @@
 				}
 				restBttnLabel.text = "REST";
 				isResting = false;
+				updateLog("                           ----------");
 			}
 			
 			function updateLog(str) {
@@ -556,9 +571,9 @@
 					mp = mpMax
 					count++;
 				}
-				if (count == 1) {updateLog("- You have leveled up by 1 level!");}
+				if (count == 1) {updateLog("- Leveled up by 1 level!");}
 				else if (count > 1) {
-					str = "- You have leveled up by" + count + "levels!";
+					str = "- Leveled up by" + count + "levels!";
 					updateLog(str);
 				}
 				lvlLabel.text = "Level: " + level;
@@ -607,6 +622,7 @@
 				}
 				exp = exp + Math.round(amount);
 				expLabel.text = "Exp: " + exp + " / " + nextLevelExp;
+				return Math.round(amount);
 			}
 			
 			function addGold(id, multi) {
@@ -620,6 +636,7 @@
 				}
 				gold = gold + Math.round(amount);
 				goldLabel.text = "Gold: " + gold;
+				return Math.round(amount);
 			}
 		</script>
 	</body>
